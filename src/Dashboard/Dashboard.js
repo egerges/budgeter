@@ -10,23 +10,19 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { mainListItems } from '../Shared/Sidenav';
 import Banner from '../Shared/Banner';
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
-import { auth, db, logout } from "../Firebase";
+import { auth, db, getDashboardData, logout } from "../Firebase";
 import { query, collection, getDocs, where } from "firebase/firestore";
-import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
@@ -79,7 +75,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const mdTheme = createTheme();
 
 function DashboardContent() {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -92,6 +88,25 @@ function DashboardContent() {
   const handlePopUpMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const [income, setIncome] = React.useState('');
+  const [expense, setExpense] = React.useState('');
+  const [total, setTotal] = React.useState('');
+
+  useEffect(() => {
+    getDashboardData()
+    .then(dashInfo => {
+      setIncome(separator(dashInfo.incomes));
+      setExpense(separator(dashInfo.expenses));
+      setTotal(separator(dashInfo.total));
+    });
+  }, []);
+
+  function separator(numb) {
+    var str = numb.toString().split(".");
+    str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return str.join(".");
+  }
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -124,16 +139,12 @@ function DashboardContent() {
             >
               Dashboard
             </Typography>
-            <IconButton color="inherit">
-              {/* <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge> */}
+            <IconButton color="inherit" onClick={handlePopUpMenuClick}>
                 <SettingsIcon 
                     id="popup-button"
                     aria-controls={openPopUpMenu ? 'basic-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={openPopUpMenu ? 'true' : undefined}
-                    onClick={handlePopUpMenuClick}
                 />
             </IconButton>
           </Toolbar>
@@ -184,8 +195,7 @@ function DashboardContent() {
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-              {/* Chart
-              <Grid item xs={12} md={8} lg={9}>
+            <Grid item xs={12} md={4} lg={3}>
                 <Paper
                   sx={{
                     p: 2,
@@ -194,10 +204,9 @@ function DashboardContent() {
                     height: 240,
                   }}
                 >
-                  <Chart />
+                  <Banner title="Incomes" amount={`$${income}`} url="/income" date={new Date().toDateString()} />
                 </Paper>
-              </Grid> */}
-              {/* Recent Deposits */}
+              </Grid>
               <Grid item xs={12} md={4} lg={3}>
                 <Paper
                   sx={{
@@ -207,16 +216,21 @@ function DashboardContent() {
                     height: 240,
                   }}
                 >
-                  <Banner title="Expenses" amount="$100" url="/expenses" date="March 15, 2022" />
+                  <Banner title="Expenses" amount={`$${expense}`} url="/expenses" date={new Date().toDateString()} />
                 </Paper>
               </Grid>
-              {/* Recent Orders */}
-              {/* <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
+              <Grid item xs={12} md={4} lg={3}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: 240,
+                  }}
+                >
+                  <Banner title="Remainder" amount={`$${total}`} url="/dashboard" date={new Date().toDateString()} />
                 </Paper>
               </Grid>
-               */}
             </Grid>
           </Container>
         </Box>

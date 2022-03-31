@@ -18,13 +18,13 @@ import { mainListItems } from '../Shared/Sidenav';
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
-import { auth, db, getIncomes, logout } from "../Firebase";
+import { auth, db, getExpenses, getExpensesReceiptURL, logout } from "../Firebase";
 import { query, collection, getDocs, where } from "firebase/firestore";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-import IncomeTable from './IncomeTable';
-import IncomeFormModal from './IncomeFormModal';
+import ExpensesTable from './ExpensesTable';
+import ExpensesFormModal from './ExpensesFormModal';
 
 const drawerWidth = 240;
 
@@ -74,7 +74,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const mdTheme = createTheme();
 
-function IncomeContent(props) {
+function ExpensesContent(props) {
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -91,21 +91,31 @@ function IncomeContent(props) {
 
   const [rows, setRows] = React.useState([]);
 
-  function createData(id, amount, title, date) {
+  function createData(id, amount, title, date, url) {
     return {
       id,
       amount, 
       title, 
-      date
+      date,
+      url
     };
   }
 
   useEffect(() => {
-    getIncomes()
+    getExpenses()
     .then(res => {
       let rows = [];
-      res.docs.forEach(income => {
-        rows.push(createData(income.id, income.data().amount, income.data()["title"], income.data().date.toDate().toDateString()));
+      res.docs.forEach(expense => {
+        const url = getExpensesReceiptURL(`${expense.id}.${expense.data().fileExtension}`);
+        rows.push(
+            createData(
+                expense.id, 
+                expense.data().amount, 
+                expense.data()["title"], 
+                expense.data().date.toDate().toDateString(),
+                url
+            )
+        );
       });
       setRows(rows);
     })
@@ -141,7 +151,7 @@ function IncomeContent(props) {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Income
+              Expenses
             </Typography>
             <IconButton color="inherit" onClick={handlePopUpMenuClick}>
                 <SettingsIcon 
@@ -196,8 +206,8 @@ function IncomeContent(props) {
         >
           <Toolbar />
           <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-            <IncomeFormModal/>
-            <IncomeTable rows={rows}/>
+            <ExpensesFormModal/>
+            <ExpensesTable rows={rows}/>
           </Container>
         </Box>
       </Box>
@@ -205,7 +215,7 @@ function IncomeContent(props) {
   );
 }
 
-export default function Income() {
+export default function Expenses() {
     const [user, loading, error] = useAuthState(auth);
     const [name, setName] = useState("");
     const navigate = useNavigate();
@@ -228,5 +238,5 @@ export default function Income() {
         fetchUserName();
     }, [user, loading, navigate]);
 
-    return <IncomeContent/>;
+    return <ExpensesContent/>;
 }

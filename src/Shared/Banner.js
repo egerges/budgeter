@@ -11,7 +11,7 @@ export default function Banner(props) {
         {props.amount}
       </Typography>
       <Typography color="text.secondary" sx={{ flex: 1 }}>
-        on {props.date}
+        as of {props.date}
       </Typography>
       <div>
         <Link color="primary" href={props.url}>

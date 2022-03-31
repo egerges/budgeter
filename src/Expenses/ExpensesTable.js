@@ -20,16 +20,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 
-import { deleteIncome, getIcomes } from "../Firebase";
+import { deleteExpenses } from "../Firebase";
 
-function createData(id, amount, title, date) {
-  return {
-    id,
-    amount, 
-    title, 
-    date
-  };
-}
+// function createData(id, amount, title, date) {
+//   return {
+//     id,
+//     amount, 
+//     title, 
+//     date
+//   };
+// }
 
 // const rows = [
 //   createData(1, 100, "Test", "November 20, 2022"),
@@ -90,7 +90,12 @@ const headCells = [
     id: 'date',
     disablePadding: true,
     label: 'Date',
-  }
+  },
+  {
+    id: 'receipt',
+    disablePadding: true,
+    label: 'Receipt',
+  },
 ];
 
 function EnhancedTableHead(props) {
@@ -157,7 +162,7 @@ const EnhancedTableToolbar = (props) => {
     if (confirmAction) {
       const selected = props.selected;
       selected.forEach(item => {
-        deleteIncome(item)
+        deleteExpenses(item)
         .then(() => {
           window.location.reload(false);
         })
@@ -195,7 +200,7 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Income List
+          Expenses List
         </Typography>
       )}
 
@@ -335,6 +340,7 @@ export default function EnhancedTable(props) {
                       </TableCell>
                       <TableCell>{row.title}</TableCell>
                       <TableCell>{row.date}</TableCell>
+                      <TableCell><a href={row.url} target="_blank" rel="noreferrer">View Image</a></TableCell>
                     </TableRow>
                   );
                 })}

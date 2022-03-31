@@ -15,7 +15,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-import { addIncome } from '../Firebase';
+import { addExpenses } from '../Firebase';
 
 export default function FormDialog(props) {
   const [open, setOpen] = React.useState(false);
@@ -60,11 +60,14 @@ export default function FormDialog(props) {
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
+  const [receipt, setReceipt] = useState('');
 
   const handleAdd = () => {
     let date = new Date(year, month, day);
+    const splited = receipt.split('.');
+    const ext = splited[splited.length -1];
     if(isDateBeforeToday(date)) {
-      addIncome(title, amount, date)
+      addExpenses(title, amount, date, receipt, ext)
       .then(res => {
         window.location.reload(false);
       })
@@ -73,7 +76,7 @@ export default function FormDialog(props) {
         console.log(err);
       });
     } else {
-      alert("You can't postdate an income!");
+      alert("You can't postdate an expense!");
     }
   }
 
@@ -87,7 +90,7 @@ export default function FormDialog(props) {
           <AddIcon />
       </Fab>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Income</DialogTitle>
+        <DialogTitle>Add Expense</DialogTitle>
         <DialogContent>
             <TextField
               autoFocus
@@ -154,6 +157,17 @@ export default function FormDialog(props) {
               {getYears()}
             </Select>
           </FormControl>
+          <FormControl fullWidth variant="standard">
+            <InputLabel htmlFor="standard-adornment-amount">Receipt</InputLabel>
+            <Input
+              type='file'
+              id="standard-adornment-receipt"
+              accept="image/*"
+              onChange={(e)=>{setReceipt(e.target.value)}}
+              value={receipt}
+              startAdornment={<InputAdornment position="start">File: </InputAdornment>}
+            />
+        </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

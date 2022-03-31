@@ -11,6 +11,7 @@ import Register from './Register/Register';
 import Reset from './Reset/Reset';
 import Dashboard from './Dashboard/Dashboard';
 import Income from './Income/Income';
+import Expenses from './Expenses/Expenses';
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
         <Route exact path="/reset" element={<Reset />} />
         <Route exact path="/dashboard" element={<Dashboard />} />
         <Route exact path="/income" element={<Income />} />
-        <Route exact path="/expenses" element={<Income />} />
+        <Route exact path="/expenses" element={<Expenses />} />
       </Routes>
     </Router>
   </div>
